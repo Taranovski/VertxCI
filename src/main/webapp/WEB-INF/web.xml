@@ -1,0 +1,11 @@
+<web-app>
+    <servlet>
+        <servlet-name>VertxCI</servlet-name>
+        <servlet-class>vertx.example.vertxci.ContainerServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>VertxCI</servlet-name>
+        <url-pattern>/VertxCI</url-pattern>
+    </servlet-mapping>
+</web-app>
