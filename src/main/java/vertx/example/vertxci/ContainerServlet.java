@@ -26,7 +26,7 @@ public class ContainerServlet extends HttpServlet {
         httpServer = vertx.createHttpServer();
         httpServer
                 .requestHandler(req -> req.response()
-                        .end("Hello World from Vertx (changed)!"))
+                        .end("Hello World from Vertx (changed 2nd time)!"))
                 .listen(8081, "127.0.0.1");
     }
 
