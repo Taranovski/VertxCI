@@ -44,4 +44,8 @@ public class HTTPServerVerticleTest {
         }));
     }
 
+    @Test
+    public void fail() {
+        fail();
+    }
 }
