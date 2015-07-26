@@ -6,7 +6,6 @@
 package vertx.example.vertxci;
 
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpServer;
 import java.util.Set;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -23,6 +22,7 @@ public class ContainerContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         this.vertx = Vertx.vertx();
+        // deploy verticles here
         vertx.deployVerticle(new HTTPServerVerticle());
     }
 
