@@ -13,4 +13,10 @@
         <servlet-name>VertxCI</servlet-name>
         <url-pattern>/VertxCI</url-pattern>
     </servlet-mapping>
+    
+    <listener>
+        <listener-class>
+            vertx.example.vertxci.ContainerContextListener
+        </listener-class>
+    </listener>
 </web-app>

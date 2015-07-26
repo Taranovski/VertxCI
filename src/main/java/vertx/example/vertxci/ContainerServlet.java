@@ -5,46 +5,11 @@
  */
 package vertx.example.vertxci;
 
-import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpServer;
-
 import javax.servlet.http.HttpServlet;
-import java.util.Set;
 
 /**
  * @author Alyx
  */
 public class ContainerServlet extends HttpServlet {
-
-    Vertx vertx;
-    HttpServer httpServer;
-
-    @Override
-    public void init() {
-        this.vertx = Vertx.vertx();
-        System.out.println("VERTX!!!!");
-        httpServer = vertx.createHttpServer();
-        httpServer
-                .requestHandler(req -> req.response()
-                        .end("Hello World from Vertx (changed 2nd time)!"))
-                .listen(8081, "127.0.0.1");
-    }
-
-    @Override
-    public void destroy() {
-        if (httpServer != null){
-            httpServer.close();
-        }
-        
-        if (vertx != null) {
-            Set<String> deploymentIDs = vertx.deploymentIDs();
-            for (String deploymentID : deploymentIDs) {
-                System.out.println("undeploying: " + deploymentID);
-                vertx.undeploy(deploymentID);
-            }
-            vertx.close();
-        }
-        super.destroy();
-    }
 
 }
