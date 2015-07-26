@@ -6,12 +6,11 @@
 package vertx.example.vertxci;
 
 import io.vertx.core.Vertx;
-import java.util.Set;
-import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
+import java.util.Set;
 
 /**
- *
  * @author Alyx
  */
 public class ContainerServlet extends HttpServlet {
@@ -19,10 +18,13 @@ public class ContainerServlet extends HttpServlet {
     Vertx vertx;
 
     @Override
-    public void init() throws ServletException {
-        super.init();
-        vertx = Vertx.vertx();
-        vertx.createHttpServer().requestHandler(req -> req.response().end("Hello World from Vertx!")).listen(8081);
+    public void init() {
+        this.vertx = Vertx.vertx();
+        System.out.println("VERTX!!!!");
+        vertx.createHttpServer()
+                .requestHandler(req -> req.response()
+                        .end("Hello World from Vertx!"))
+                .listen(8081, "127.0.0.1");
     }
 
     @Override
@@ -30,6 +32,7 @@ public class ContainerServlet extends HttpServlet {
         if (vertx != null) {
             Set<String> deploymentIDs = vertx.deploymentIDs();
             for (String deploymentID : deploymentIDs) {
+                System.out.println("undeploying: " + deploymentID);
                 vertx.undeploy(deploymentID);
             }
             vertx.close();
