@@ -22,7 +22,7 @@ public class HTTPServerVerticle extends AbstractVerticle {
         httpServer = vertx.createHttpServer();
         httpServer
                 .requestHandler(req -> req.response()
-                        .end("Hello World from Vertx (changed 6th time)!"))
+                        .end("Hello World from Vertx (changed 7th time)!"))
                 .listen(8081, "127.0.0.1");
     }
 
