@@ -23,7 +23,7 @@ public class ContainerServlet extends HttpServlet {
         System.out.println("VERTX!!!!");
         vertx.createHttpServer()
                 .requestHandler(req -> req.response()
-                        .end("Hello World from Vertx!"))
+                        .end("Hello World from Vertx (changed)!"))
                 .listen(8081, "127.0.0.1");
     }
 
