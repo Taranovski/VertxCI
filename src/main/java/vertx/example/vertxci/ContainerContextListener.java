@@ -27,16 +27,19 @@ public class ContainerContextListener implements ServletContextListener {
         httpServer = vertx.createHttpServer();
         httpServer
                 .requestHandler(req -> req.response()
-                        .end("Hello World from Vertx (changed 2nd time)!"))
+                        .end("Hello World from Vertx (changed 3rd time)!"))
                 .listen(8081, "127.0.0.1");
+        System.out.println("server started!");
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+
+        System.out.println("DESTROY!!!!");
         if (httpServer != null) {
             httpServer.close();
         }
-
+        System.out.println("server should be closed");
         if (vertx != null) {
             Set<String> deploymentIDs = vertx.deploymentIDs();
             for (String deploymentID : deploymentIDs) {
@@ -45,6 +48,7 @@ public class ContainerContextListener implements ServletContextListener {
             }
             vertx.close();
         }
+        System.out.println("vertx should be closed");
     }
 
 }
