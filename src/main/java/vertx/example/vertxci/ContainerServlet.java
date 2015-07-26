@@ -6,6 +6,7 @@
 package vertx.example.vertxci;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServer;
 
 import javax.servlet.http.HttpServlet;
 import java.util.Set;
@@ -16,12 +17,14 @@ import java.util.Set;
 public class ContainerServlet extends HttpServlet {
 
     Vertx vertx;
+    HttpServer httpServer;
 
     @Override
     public void init() {
         this.vertx = Vertx.vertx();
         System.out.println("VERTX!!!!");
-        vertx.createHttpServer()
+        httpServer = vertx.createHttpServer();
+        httpServer
                 .requestHandler(req -> req.response()
                         .end("Hello World from Vertx (changed)!"))
                 .listen(8081, "127.0.0.1");
@@ -29,6 +32,10 @@ public class ContainerServlet extends HttpServlet {
 
     @Override
     public void destroy() {
+        if (httpServer != null){
+            httpServer.close();
+        }
+        
         if (vertx != null) {
             Set<String> deploymentIDs = vertx.deploymentIDs();
             for (String deploymentID : deploymentIDs) {
