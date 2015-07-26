@@ -10,6 +10,7 @@ import io.vertx.core.http.HttpServer;
 import java.util.Set;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import vertx.example.verticle.HTTPServerVerticle;
 
 /**
  *
@@ -18,28 +19,15 @@ import javax.servlet.ServletContextListener;
 public class ContainerContextListener implements ServletContextListener {
 
     Vertx vertx;
-    HttpServer httpServer;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         this.vertx = Vertx.vertx();
-        System.out.println("VERTX!!!!");
-        httpServer = vertx.createHttpServer();
-        httpServer
-                .requestHandler(req -> req.response()
-                        .end("Hello World from Vertx (changed 4th time)!"))
-                .listen(8081, "127.0.0.1");
-        System.out.println("server started!");
+        vertx.deployVerticle(new HTTPServerVerticle());
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-
-        System.out.println("DESTROY!!!!");
-        if (httpServer != null) {
-            httpServer.close();
-        }
-        System.out.println("server should be closed");
         if (vertx != null) {
             Set<String> deploymentIDs = vertx.deploymentIDs();
             for (String deploymentID : deploymentIDs) {
@@ -48,7 +36,6 @@ public class ContainerContextListener implements ServletContextListener {
             }
             vertx.close();
         }
-        System.out.println("vertx should be closed");
     }
 
 }
