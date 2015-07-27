@@ -43,7 +43,7 @@ public class HTTPServerVerticle extends AbstractVerticle {
                     });
                 } else {
                     httpServerRequest.response()
-                            .end("Hello World from Vertx (changed 8th time)!");
+                            .end("Hello World from Vertx (changed 9th time)!");
                 }
             }
         })
