@@ -9,6 +9,7 @@ import io.vertx.core.Vertx;
 import java.util.Set;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import vertx.example.verticle.DatabaseVerticle;
 import vertx.example.verticle.HTTPServerVerticle;
 
 /**
@@ -24,6 +25,7 @@ public class ContainerContextListener implements ServletContextListener {
         this.vertx = Vertx.vertx();
         // deploy verticles here
         vertx.deployVerticle(new HTTPServerVerticle());
+        vertx.deployVerticle(new DatabaseVerticle());
     }
 
     @Override

@@ -6,7 +6,12 @@
 package vertx.example.verticle;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerRequest;
 
 /**
  *
@@ -15,14 +20,33 @@ import io.vertx.core.http.HttpServer;
 public class HTTPServerVerticle extends AbstractVerticle {
 
     HttpServer httpServer;
+    EventBus eventBus;
 
     @Override
     public void start() throws Exception {
         super.start();
         httpServer = vertx.createHttpServer();
-        httpServer
-                .requestHandler(req -> req.response()
-                        .end("Hello World from Vertx (changed 8th time)!"))
+        httpServer.requestHandler(new Handler<HttpServerRequest>() {
+
+            public void handle(HttpServerRequest httpServerRequest) {
+
+                String absoluteURI = httpServerRequest.absoluteURI();
+
+                if ("getFromDatabase".equals(absoluteURI)) {
+                    eventBus.send("database", "get", new Handler<AsyncResult<Message<String>>>() {
+
+                        @Override
+                        public void handle(AsyncResult<Message<String>> event) {
+                            httpServerRequest.response()
+                                    .end(event.result().body());
+                        }
+                    });
+                } else {
+                    httpServerRequest.response()
+                            .end("Hello World from Vertx (changed 8th time)!");
+                }
+            }
+        })
                 .listen(8081, "127.0.0.1");
     }
 
