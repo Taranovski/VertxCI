@@ -31,7 +31,7 @@ public class HTTPServerVerticle extends AbstractVerticle {
             public void handle(HttpServerRequest httpServerRequest) {
 
                 String absoluteURI = httpServerRequest.absoluteURI();
-
+                System.out.println(absoluteURI);
                 if ("getFromDatabase".equals(absoluteURI)) {
                     eventBus.send("database", "get", new Handler<AsyncResult<Message<String>>>() {
 
