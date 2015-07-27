@@ -22,13 +22,13 @@ import io.vertx.ext.sql.SQLConnection;
  */
 public class DatabaseVerticle extends AbstractVerticle {
 
-    Vertx vertx;
     EventBus eventBus;
     JDBCClient client;
 
     @Override
     public void start() throws Exception {
         super.start();
+        eventBus = vertx.eventBus();
         client = JDBCClient.createShared(vertx, new JsonObject()
                 .put("url", "jdbc:postgresql://localhost:5432/postgres")
                 .put("driver_class", "org.postgresql.Driver")

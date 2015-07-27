@@ -26,13 +26,14 @@ public class HTTPServerVerticle extends AbstractVerticle {
     public void start() throws Exception {
         super.start();
         httpServer = vertx.createHttpServer();
+        eventBus = vertx.eventBus();
         httpServer.requestHandler(new Handler<HttpServerRequest>() {
 
             public void handle(HttpServerRequest httpServerRequest) {
 
-                String absoluteURI = httpServerRequest.absoluteURI();
-                System.out.println(absoluteURI);
-                if ("getFromDatabase".equals(absoluteURI)) {
+                String path = httpServerRequest.path();
+                System.out.println(path);
+                if ("/getFromDatabase".equals(path)) {
                     eventBus.send("database", "get", new Handler<AsyncResult<Message<String>>>() {
 
                         @Override
