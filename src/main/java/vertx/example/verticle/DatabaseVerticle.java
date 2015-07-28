@@ -6,6 +6,7 @@
 package vertx.example.verticle;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
@@ -42,25 +43,32 @@ public class DatabaseVerticle extends AbstractVerticle {
             public void handle(Message<String> event) {
                 String body = event.body();
                 if ("get".equals(body)) {
-                    client.getConnection(conn -> {
-                        if (conn.failed()) {
-                            System.err.println(conn.cause().getMessage());
-                            return;
-                        }
+                    client.getConnection(new Handler<AsyncResult<SQLConnection>>() {
 
-                        // query some data with arguments
-                        query(conn.result(), "select * from test", new JsonArray().add(2), rs -> {
-                            for (JsonArray line : rs.getResults()) {
-                                event.reply(line.encode());
+                        public void handle(AsyncResult<SQLConnection> conn) {
+                            if (conn.failed()) {
+                                System.err.println(conn.cause().getMessage());
+                                return;
                             }
 
-                            // and close the connection
-                            conn.result().close(done -> {
-                                if (done.failed()) {
-                                    throw new RuntimeException(done.cause());
+                            // query some data with arguments
+                            query(conn.result(), "select * from test", new Handler<ResultSet>() {
+
+                                public void handle(ResultSet rs) {
+                                    event.reply(rs.getResults().toString());
+
+                                    // and close the connection
+                                    conn.result().close(new Handler<AsyncResult<Void>>() {
+
+                                        public void handle(AsyncResult<Void> done) {
+                                            if (done.failed()) {
+                                                throw new RuntimeException(done.cause());
+                                            }
+                                        }
+                                    });
                                 }
                             });
-                        });
+                        }
                     });
 
                 }
@@ -69,13 +77,16 @@ public class DatabaseVerticle extends AbstractVerticle {
 
     }
 
-    private void query(SQLConnection conn, String sql, JsonArray params, Handler<ResultSet> done) {
-        conn.queryWithParams(sql, params, res -> {
-            if (res.failed()) {
-                throw new RuntimeException(res.cause());
-            }
+    private void query(SQLConnection conn, String sql, Handler<ResultSet> done) {
+        conn.query(sql, new Handler<AsyncResult<ResultSet>>() {
 
-            done.handle(res.result());
+            public void handle(AsyncResult<ResultSet> res) {
+                if (res.failed()) {
+                    throw new RuntimeException(res.cause());
+                }
+
+                done.handle(res.result());
+            }
         });
     }
 
