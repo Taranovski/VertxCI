@@ -33,7 +33,7 @@ public class DatabaseVerticle extends AbstractVerticle {
                 .put("url", "jdbc:postgresql://localhost:5432/postgres")
                 .put("driver_class", "org.postgresql.Driver")
                 .put("user", "postgres")
-                .put("password", "postgres")
+                .put("password", "post")
                 .put("max_pool_size", 30));
 
         eventBus.consumer("database", new Handler<Message<String>>() {
