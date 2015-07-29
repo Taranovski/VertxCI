@@ -37,56 +37,40 @@ public class DatabaseVerticle extends AbstractVerticle {
                 .put("password", "post")
                 .put("max_pool_size", 30));
 
-        eventBus.consumer("database", new Handler<Message<String>>() {
-
-            @Override
-            public void handle(Message<String> event) {
-                String body = event.body();
-                if ("get".equals(body)) {
-                    client.getConnection(new Handler<AsyncResult<SQLConnection>>() {
-
-                        public void handle(AsyncResult<SQLConnection> conn) {
-                            if (conn.failed()) {
-                                System.err.println(conn.cause().getMessage());
-                                return;
+        eventBus.consumer("database", (Message<String> event) -> {
+            String body = event.body();
+            if ("get".equals(body)) {
+                client.getConnection((AsyncResult<SQLConnection> conn) -> {
+                    if (conn.failed()) {
+                        System.err.println(conn.cause().getMessage());
+                        return;
+                    }
+                    
+                    // query some data with arguments
+                    query(conn.result(), "select * from test", (ResultSet rs) -> {
+                        event.reply(rs.getResults().toString());
+                        
+                        // and close the connection
+                        conn.result().close((AsyncResult<Void> done) -> {
+                            if (done.failed()) {
+                                throw new RuntimeException(done.cause());
                             }
-
-                            // query some data with arguments
-                            query(conn.result(), "select * from test", new Handler<ResultSet>() {
-
-                                public void handle(ResultSet rs) {
-                                    event.reply(rs.getResults().toString());
-
-                                    // and close the connection
-                                    conn.result().close(new Handler<AsyncResult<Void>>() {
-
-                                        public void handle(AsyncResult<Void> done) {
-                                            if (done.failed()) {
-                                                throw new RuntimeException(done.cause());
-                                            }
-                                        }
-                                    });
-                                }
-                            });
-                        }
+                        });
                     });
-
-                }
+                });
+                
             }
         });
 
     }
 
     private void query(SQLConnection conn, String sql, Handler<ResultSet> done) {
-        conn.query(sql, new Handler<AsyncResult<ResultSet>>() {
-
-            public void handle(AsyncResult<ResultSet> res) {
-                if (res.failed()) {
-                    throw new RuntimeException(res.cause());
-                }
-
-                done.handle(res.result());
+        conn.query(sql, (AsyncResult<ResultSet> res) -> {
+            if (res.failed()) {
+                throw new RuntimeException(res.cause());
             }
+            
+            done.handle(res.result());
         });
     }
 

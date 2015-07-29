@@ -27,25 +27,17 @@ public class HTTPServerVerticle extends AbstractVerticle {
         super.start();
         httpServer = vertx.createHttpServer();
         eventBus = vertx.eventBus();
-        httpServer.requestHandler(new Handler<HttpServerRequest>() {
-
-            public void handle(HttpServerRequest httpServerRequest) {
-
-                String path = httpServerRequest.path();
-                System.out.println(path);
-                if ("/getFromDatabase".equals(path)) {
-                    eventBus.send("database", "get", new Handler<AsyncResult<Message<String>>>() {
-
-                        @Override
-                        public void handle(AsyncResult<Message<String>> event) {
-                            httpServerRequest.response()
-                                    .end(event.result().body());
-                        }
-                    });
-                } else {
+        httpServer.requestHandler((HttpServerRequest httpServerRequest) -> {
+            String path = httpServerRequest.path();
+            System.out.println(path);
+            if ("/getFromDatabase".equals(path)) {
+                eventBus.send("database", "get", (AsyncResult<Message<String>> event) -> {
                     httpServerRequest.response()
-                            .end("Hello World from Vertx (changed 10th time)!");
-                }
+                            .end(event.result().body());
+                });
+            } else {
+                httpServerRequest.response()
+                        .end("Hello World from Vertx (changed 11th time)!");
             }
         })
                 .listen(8081, "127.0.0.1");
