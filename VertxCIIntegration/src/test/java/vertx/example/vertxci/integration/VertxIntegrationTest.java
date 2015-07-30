@@ -50,11 +50,27 @@ public class VertxIntegrationTest {
     }
     
     @Test
-    public void testDBConnection() throws ClassNotFoundException, SQLException{
+    public void testDBConnectionOnLocalhostPostgresPost() throws ClassNotFoundException, SQLException{
         Class.forName("org.postgresql.Driver");
         Connection connection = DriverManager.getConnection(
                 "jdbc:postgresql://localhost:5432/postgres", 
                 "postgres", "post");
+        
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("select * from test");
+        
+        resultSet.next();
+        
+        assertEquals(1, resultSet.getInt(1));
+        assertEquals("abc", resultSet.getString(2));
+    }
+    
+    @Test
+    public void testDBConnectionOnLocalhostUbuntuVertx() throws ClassNotFoundException, SQLException{
+        Class.forName("org.postgresql.Driver");
+        Connection connection = DriverManager.getConnection(
+                "jdbc:postgresql://localhost:5432/postgres", 
+                "ubuntu", "vertx");
         
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from test");
