@@ -35,76 +35,44 @@ public class FileHandlerVerticle extends AbstractExtendedVerticle {
     private String delimiter;
 
     private boolean initialized;
-//    Vertx vertx = Vertx.vertx();
-//    EventBus bus = vertx.eventBus();
-
-
-    public FileHandlerVerticle() {
-//        initializeFileSystem();
-    }
 
     @Override
     public void start() throws Exception {
         super.start();
         initializeFileSystem();
-        bus.consumer(uploadFileAction, new Handler<Message<FileDescriptorDto>>() {
-            @Override
-            public void handle(Message<FileDescriptorDto> message) {
-                FileDescriptorDto fileUploadEntryDto = message.body();
-                String path = getFilePath(fileUploadEntryDto);
-                Buffer fileSourceStream = fileUploadEntryDto.getBuffer();
-                Path path1 = Paths.get(path);
-                if (Files.notExists(path1)) {
-                    try {
-                        Files.createDirectories(path1.getParent());
-                        Files.createFile(path1);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+        bus.consumer(uploadFileAction, (Message<FileDescriptorDto> message) -> {
+            FileDescriptorDto fileUploadEntryDto = message.body();
+            String path = getFilePath(fileUploadEntryDto);
+            Buffer fileSourceStream = fileUploadEntryDto.getBuffer();
+            Path path1 = Paths.get(path);
+            if (Files.notExists(path1)) {
+                try {
+                    Files.createDirectories(path1.getParent());
+                    Files.createFile(path1);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
+            }
 
-                vertxFileSystem.writeFile(path, fileSourceStream, (AsyncResult<Void> event) -> {
+            vertxFileSystem.writeFile(path, fileSourceStream, (AsyncResult<Void> event) -> {
+            });
+        });
+        bus.consumer(downloadFileAction, (Message<FileDescriptorDto> message) -> {
+            FileDescriptorDto fileUploadEntryDto = message.body();
+            String path = getFilePath(fileUploadEntryDto);
+            Path path1 = Paths.get(path);
+            if (Files.exists(path1)) {
+                vertxFileSystem.readFile(path, (AsyncResult<Buffer> event) -> {
+                    if (event.failed()) {
+                        throw new RuntimeException(event.cause());
+                    }
+
+                    Buffer buffer = event.result();
+                    fileUploadEntryDto.setBuffer(buffer);
+                    message.reply(fileUploadEntryDto);
                 });
             }
         });
-//        bus.consumer(downloadFileAction, new Handler<Message<FileDownloadEntryDto>>() {
-//                    @Override
-//                    public void handle(Message<FileDownloadEntryDto> message) {
-//                        FileDownloadEntryDto fileUploadEntryDto = message.body();
-//                        String path = getFilePath(fileUploadEntryDto);
-//                        WriteStream writeStream = fileUploadEntryDto.getWriteStream();
-//
-//                        OpenOptions openOptions = new OpenOptions();
-//                        vertxFileSystem.open(path, openOptions, (AsyncResult<AsyncFile> fileEvent) -> {
-//                                    if (fileEvent.failed()) {
-//                                        throw new RuntimeException(fileEvent.cause());
-//                                    }
-//
-//                                    AsyncFile asyncFile = fileEvent.result();
-//
-//                                    try {
-//                                        fileUploadEntryDto.setFileSize(Files.size(Paths.get(path)));
-//                                    } catch (IOException e) {
-//                                        throw new RuntimeException(e);
-//                                    }
-//
-//                                    Pump pump = Pump.pump(asyncFile, writeStream);
-//                                    asyncFile.endHandler(new VoidHandler() {
-//                                                             @Override
-//                                                             public void handle() {
-//                                                                 asyncFile.close();
-//                                                                 message.reply(fileUploadEntryDto);
-//                                                             }
-//                                                         }
-//                                    );
-//                                    pump.start();
-//                                }
-//
-//                        );
-//                    }
-//                }
-//
-//        );
     }
 
     private String getFilePath(FileDescriptorDto fileUploadEntryDto) {

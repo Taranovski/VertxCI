@@ -7,7 +7,7 @@ import vertx.example.common.dto.FileDescriptorDto;
 /**
  * Created by Alyx on 09.08.2015.
  */
-public class FileUploadDtoCodec implements MessageCodec<FileDescriptorDto, FileDescriptorDto> {
+public class FileDescriptorDtoCodec implements MessageCodec<FileDescriptorDto, FileDescriptorDto> {
     @Override
     public void encodeToWire(Buffer buffer, FileDescriptorDto fileUploadEntryDto) {
 
