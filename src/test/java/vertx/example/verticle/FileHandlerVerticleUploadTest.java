@@ -5,17 +5,12 @@
  */
 package vertx.example.verticle;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.eventbus.Message;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import vertx.example.common.dto.FileDescriptorDto;
 import vertx.example.common.dto.codec.FileDescriptorDtoCodec;
@@ -25,12 +20,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.junit.AfterClass;
 
 import static org.junit.Assert.*;
-import org.junit.BeforeClass;
 
 /**
  * @author Alyx
@@ -84,7 +75,7 @@ public class FileHandlerVerticleUploadTest {
         assertFalse(Files.exists(path));
     }
 
-    @Test
+    @Test(timeout = 3000L)
     public void fileHandlerVerticleShouldDeploysAndUndeploySuccessfully(TestContext context) {
         // Deploy and undeploy a verticle
         vertx.deployVerticle(new FileHandlerVerticle(), context.asyncAssertSuccess((String deploymentID) -> {

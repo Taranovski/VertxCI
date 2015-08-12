@@ -1,7 +1,6 @@
 package vertx.example.verticle;
 
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.file.FileSystem;
@@ -109,18 +108,18 @@ public class FileHandlerVerticle extends AbstractExtendedVerticle {
     protected StatusCheck checkVerticle(int level) {
         switch (level) {
             case 1: {
-                return new FileHandlerStatusCheck(true, "fileHandler vertice is up and running", level);
+                return new FileHandlerStatusCheck(true, "fileHandler vertice is up and running", logLevel);
             }
             case 2: {
                 FileSystemCheck superficialCheck = FileSystemCheck.makeSuperficialCheck(rootPath);
-                return new FileHandlerStatusCheck(superficialCheck.isSuccessful(), superficialCheck.getMessage(), level);
+                return new FileHandlerStatusCheck(superficialCheck.isSuccessful(), superficialCheck.getMessage(), logLevel);
             }
             case 3: {
                 FileSystemCheck fullCheck = FileSystemCheck.makeFullCheck(rootPath);
-                return new FileHandlerStatusCheck(fullCheck.isSuccessful(), fullCheck.getMessage(), level);
+                return new FileHandlerStatusCheck(fullCheck.isSuccessful(), fullCheck.getMessage(), logLevel);
             }
             default: {
-                return new FileHandlerStatusCheck(false, "unrecognized status check level", level);
+                return new FileHandlerStatusCheck(false, "unrecognized status check level", logLevel);
             }
         }
     }

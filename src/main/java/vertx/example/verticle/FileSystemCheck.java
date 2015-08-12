@@ -1,5 +1,10 @@
 package vertx.example.verticle;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -58,7 +63,45 @@ public class FileSystemCheck {
     }
 
     private static boolean checkFileSystem(String rootPath) {
-        return false;
+        String path = rootPath + FileSystems.getDefault().getSeparator() + "fileSystemCheckFile.txt";
+
+        int limit = 10000;
+        int flushLimit = 100;
+        boolean success = true;
+
+        Path realPath = Paths.get(path);
+        try {
+            if (Files.exists(realPath)) {
+                Files.delete(realPath);
+            }
+
+            Files.createFile(realPath);
+            BufferedWriter bufferedWriter = Files.newBufferedWriter(realPath);
+
+            for (int i = 0; i < limit; i++) {
+                bufferedWriter.write(i);
+                if (i % flushLimit == 0) {
+                    bufferedWriter.flush();
+                }
+            }
+            bufferedWriter.flush();
+            bufferedWriter.close();
+
+            BufferedReader bufferedReader = Files.newBufferedReader(realPath);
+
+            for (int i = 0; i < limit; i++) {
+                int read = bufferedReader.read();
+                if (i != read) {
+                    success = false;
+                    break;
+                }
+            }
+            bufferedReader.close();
+        } catch (IOException e) {
+            success = false;
+        }
+
+        return success;
     }
 
     public String getMessage() {
